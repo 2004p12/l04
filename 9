@@ -1,0 +1,44 @@
+9a
+# Sample data
+hours <- c(1, 2, 3, 4, 5)
+marks <- c(40, 50, 60, 70, 80)
+
+# Linear regression model
+model <- lm(marks ~ hours)
+summary(model)
+
+# Visualization
+plot(hours, marks, main="Simple Linear Regression",
+     xlab="Study Hours", ylab="Marks", pch=19, col="blue")
+abline(model, col="red", lwd=2)
+
+9c
+# Sample data
+Study_Hours <- c(1, 2, 3, 4, 5, 6)
+Pass <- c(0, 0, 0, 1, 1, 1)
+
+# Logistic regression model
+model3 <- glm(Pass ~ Study_Hours, family=binomial)
+summary(model3)
+
+# Visualization
+plot(Study_Hours, Pass, main="Logistic Regression",
+     xlab="Study Hours", ylab="Pass (0/1)", pch=19, col="blue")
+curve(predict(model3, data.frame(Study_Hours=x), type="response"),
+      add=TRUE, col="red", lwd=2)
+
+9d
+# Sample data
+Study_Hours <- c(1, 2, 3, 4, 5)
+Absences <- c(8, 6, 4, 3, 2)
+
+# Poisson regression model
+model4 <- glm(Absences ~ Study_Hours, family=poisson)
+summary(model4)
+
+# Visualization
+plot(Study_Hours, Absences, main="Poisson Regression",
+     xlab="Study Hours", ylab="Absences", pch=19, col="blue")
+lines(Study_Hours, fitted(model4), col="red", lwd=2)
+
+
