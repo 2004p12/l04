@@ -1,412 +1,626 @@
-Lab Manual: Experiment-2 - Simulate a Bunch of Helium Molecules
-1. Experiment Details
-•	Title: Simulate a Bunch of Helium Molecules
-•	Experiment No: 2
-•	Date: ________________________________________
-2. Aim
-To create a 2D physics simulation of a bunch of helium molecules in a container using JavaScript, modeling their motion, collisions, van der Waals forces, and calculating the temperature of the system based on statistical mechanics.
-________________________________________
-3. Objectives
-•	To understand the behavior of helium molecules in a confined space.
-•	To implement a physics simulation with collision detection and van der Waals forces.
-•	To calculate and display the temperature of the system using the kinetic energy of molecules.
-•	To visualize molecular motion in a 2D environment using JavaScript and HTML5 Canvas.
-•	To apply periodic boundary conditions to simulate an infinite system.
-•	To learn how to simplify complex physical models (e.g., Lennard-Jones potential) for educational purposes.
-________________________________________
-4. Materials Required
-•	Hardware: Computer with a modern web browser (e.g., Chrome, Firefox).
-•	Software: 
-o	Code editor (e.g., VS Code, Sublime Text).
-o	Web browser for running the simulation.
-o	Optional: Node.js for local server setup (if needed).
-•	Other: Lab notebook, pen, and access to reference materials on statistical mechanics and JavaScript.
-________________________________________
-5. Theory/Background
-This experiment simulates the behavior of helium molecules in a 2D container. Key concepts include:
-•	Helium Molecules: Helium is a noble gas, typically monatomic, but for educational purposes, the simulation assumes diatomic molecules to explore pairwise interactions. Each molecule is modeled as a hard sphere with a given mass (approximately 4 u for helium, or 6.646 × 10⁻²⁷ kg per atom).
-•	Collisions: Molecules undergo elastic collisions with each other and the container walls, conserving momentum and kinetic energy.
-•	Van der Waals Forces: These are weak intermolecular forces modeled (simplified) using the Lennard-Jones potential, which accounts for both attractive and repulsive interactions.
-•	Lennard-Jones Potential: The potential energy between two molecules is given by: V(r)=4ϵ[(σr)12−(σr)6]V(r) = 4\epsilon \left[ \left( \frac{\sigma}{r} \right)^{12} - \left( \frac{\sigma}{r} \right)^6 \right]V(r)=4ϵ[(rσ)12−(rσ)6] where r r r is the distance between molecules, ϵ \epsilon ϵ is the depth of the potential well, and σ \sigma σ is the distance at which the potential is zero. For simplicity, a scaled-down version is used.
-•	Periodic Boundary Conditions: Molecules exiting one side of the container reappear on the opposite side, simulating an infinite system.
-•	Temperature Calculation: The temperature is derived from the average kinetic energy of the molecules using the equipartition theorem: 12kBT=1N∑i=1N12mvi2\frac{1}{2} k_B T = \frac{1}{N} \sum_{i=1}^N \frac{1}{2} m v_i^221kBT=N1i=1∑N21mvi2 where kB k_B kB is the Boltzmann constant (1.380649 × 10⁻²³ J/K), T T T is the temperature, m m m is the mass of a molecule, and vi v_i vi is the speed of the i i i-th molecule.
-The simulation visualizes 30 helium molecules in a 2D container, displaying their motion and instantaneous temperature.
-________________________________________
-6. Procedure
-Follow these steps to implement the simulation:
-Step 1: Set Up the Development Environment
-•	Open a code editor (e.g., VS Code).
-•	Create a new project folder with three files: index.html, styles.css, and simulation.js.
-•	Set up a basic HTML5 Canvas for rendering the simulation.
-Step 2: Define Simulation Assumptions
-•	Molecules: Assume 30 diatomic helium molecules (simplified as hard spheres).
-•	Interactions: Model collisions as elastic and include a simplified van der Waals force using a Lennard-Jones-like potential.
-•	Boundary: Use periodic boundary conditions to simulate an infinite system.
-•	Temperature: Calculate temperature based on the average kinetic energy of molecules.
-Step 3: Create the HTML Structure
-•	In index.html, set up a canvas for rendering and a label for displaying temperature.
-•	Example: 
-html
-PreviewCollapseWrapCopy
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Helium Molecules Simulation</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <h1>Helium Molecules Simulation</h1>
-    <canvas id="simulationCanvas" width="600" height="600"></canvas>
-    <div id="temperature">Temperature: 0 K</div>
-    <script src="simulation.js"></script>
-</body>
-</html>
-Step 4: Style the Simulation
-•	In styles.css, add basic styling for the canvas and temperature display.
-•	Example: 
-css
-CollapseWrapCopy
-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-family: Arial, sans-serif;
-}
-canvas {
-    border: 2px solid black;
-}
-#temperature {
-    margin-top: 10px;
-    font-size: 18px;
-}
-Step 5: Implement the Simulation Logic
-•	In simulation.js, write JavaScript code to: 
-o	Initialize 30 molecules with random positions and velocities.
-o	Model elastic collisions and simplified van der Waals forces.
-o	Apply periodic boundary conditions.
-o	Calculate and display the temperature.
-o	Animate the molecules using HTML5 Canvas.
-•	Sample Code: 
-javascript
-CollapseWrapCopy
-const canvas = document.getElementById('simulationCanvas');
-const ctx = canvas.getContext('2d');
-const tempDisplay = document.getElementById('temperature');
+week1
 
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
-const NUM_MOLECULES = 30;
-const RADIUS = 5; // Molecule radius (pixels)
-const MASS = 6.646e-27; // Mass of helium molecule (kg)
-const KB = 1.380649e-23; // Boltzmann constant (J/K)
-const EPSILON = 1e-21; // Lennard-Jones well depth (J)
-const SIGMA = 2.57e-10; // Lennard-Jones distance (m, scaled for pixels)
+graph = {}
+edge_set = set()
+# Add a node only if it doesn't already exist
+def add_node(node):
+    if node in graph:
+        print(f"'{node}' already exists. Please enter a different node.")
+        return False
+    graph[node] = []
+    return True
+# Add edge only if not a duplicate
+def add_edge(u, v):
+    edge = tuple(sorted((u, v)))
+    if edge in edge_set:
+        print(f"Edge {u}-{v} already exists. Please enter a different edge.")
+        return False
+    if u not in graph or v not in graph:
+        print("Both nodes must be added before connecting them with an edge.")
+        return False
 
-let molecules = [];
+    graph[u].append(v)
+    graph[v].append(u)
+    edge_set.add(edge)
+    return True
+# BFS
+def bfs(start):
+    visited = []
+    queue = [start]
+    print("BFS:", end=" ")
 
-// Initialize molecules
-function initMolecules() {
-    for (let i = 0; i < NUM_MOLECULES; i++) {
-        molecules.push({
-            x: Math.random() * (WIDTH - 2 * RADIUS) + RADIUS,
-            y: Math.random() * (HEIGHT - 2 * RADIUS) + RADIUS,
-            vx: (Math.random() - 0.5) * 100, // Random velocity (pixels/s)
-            vy: (Math.random() - 0.5) * 100
-        });
+    while queue:
+        node = queue.pop(0)
+        if node not in visited:
+            print(node, end=" ")
+            visited.append(node)
+            for neighbor in graph[node]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+    print()
+# DFS
+def dfs(node, visited=None):
+    if visited is None:
+        visited = []
+        print("DFS:", end=" ")
+
+    if node not in visited:
+        print(node, end=" ")
+        visited.append(node)
+        for neighbor in graph[node]:
+            dfs(neighbor, visited)
+# === Input Section ===
+# Add unique nodes
+n = int(input("Enter number of nodes: "))
+i = 0
+while i < n:
+    node = input(f"Enter node {i + 1}: ").strip()
+    if add_node(node):
+        i += 1
+
+# Add edges without duplication
+e = int(input("Enter number of edges: "))
+for i in range(e):
+    while True:
+        u, v = input(f"Enter edge {i + 1} (two nodes): ").split()
+        if add_edge(u, v):
+            break
+# Start traversal
+start = input("Enter starting node: ").strip()
+if start in graph:
+    bfs(start)
+    dfs(start)
+    print()
+else:
+    print("Starting node not found in the graph.")
+
+
+week2
+
+
+def aStarAlgo(start_node, stop_node):
+    open_set = {start_node}  # Set of nodes to be evaluated
+    closed_set = set()  # Set of nodes already evaluated
+    g = {}  # Dictionary to store the distance from the start node
+    parents = {}  # Dictionary to store the parent of each node
+
+    # The distance from the start node to itself is zero
+    g[start_node] = 0
+    # The start node has no parent (it is the root)
+    parents[start_node] = start_node
+
+    while open_set:
+        n = None
+
+        # Node with the lowest f() = g + heuristic() value is chosen
+        for v in open_set:
+            if n is None or g[v] + heuristic(v) < g[n] + heuristic(n):
+                n = v
+
+        # Print current node being evaluated, heuristic value and the sets
+        print(f"\nEvaluating node: {n} (g: {g[n]}, h: {heuristic(n)}, f: {g[n] + heuristic(n)})")
+        print(f"Open Set: {open_set}")
+        print(f"Closed Set: {closed_set}")
+
+        # If the goal is reached or no more nodes can be explored
+        if n == stop_node:
+            path = []
+            while parents[n] != n:
+                path.append(n)
+                n = parents[n]
+            path.append(start_node)
+            path.reverse()  # Reverse the path to get from start to goal
+            print('Path found: {}'.format(path))
+            return path
+
+        # Explore neighbors of the current node
+        print(f"Exploring neighbors of {n}:")
+        for (m, weight) in get_neighbors(n):
+            h_m = heuristic(m)  # Heuristic value of the neighbor
+            print(f"  Neighbor: {m} with weight: {weight} and h({m}): {h_m}")
+
+            if m not in open_set and m not in closed_set:
+                open_set.add(m)
+                parents[m] = n
+                g[m] = g[n] + weight
+                print(f"  Added {m} to open set with g({m}) = {g[m]} and f({m}) = {g[m] + h_m}")
+            else:
+                if g[m] > g[n] + weight:
+                    g[m] = g[n] + weight
+                    parents[m] = n
+                    if m in closed_set:
+                        closed_set.remove(m)
+                        open_set.add(m)
+                        print(f"  Updated {m} to have a shorter path with g({m}) = {g[m]} and f({m}) = {g[m] + h_m}")
+
+        open_set.remove(n)
+        closed_set.add(n)
+
+    print('Path does not exist!')
+    return None
+
+# Function to return neighbors and their distances
+def get_neighbors(v):
+    if v in Graph_nodes:
+        return Graph_nodes[v]
+    return []
+
+# Heuristic function for each node (Manhattan or other heuristic values)
+def heuristic(n):
+    H_dist = {
+        'S': 5,
+        'A': 3,
+        'B': 4,
+        'C': 2,
+        'D': 6,
+        'G': 0,
     }
+    return H_dist.get(n, 0)
+
+# Graph representation (node -> list of (neighbor, weight))
+Graph_nodes = {
+    'S': [('A', 1), ('G', 10)],
+    'A': [('B', 2), ('C', 1)],
+    'B': [('D', 5)],
+    'C': [('D', 3), ('G', 4)],
+    'D': [('G', 2)],
 }
 
-// Simplified Lennard-Jones force
-function computeLJForce(r) {
-    if (r < RADIUS) r = RADIUS; // Prevent division by zero
-    const sigma_r = SIGMA / r;
-    const sigma_r6 = Math.pow(sigma_r, 6);
-    const sigma_r12 = sigma_r6 * sigma_r6;
-    const force = 24 * EPSILON * (2 * sigma_r12 - sigma_r6) / r;
-    return force;
-}
-
-// Update molecule positions
-function updateMolecules(dt) {
-    for (let i = 0; i < NUM_MOLECULES; i++) {
-        let mol = molecules[i];
-        let fx = 0, fy = 0;
-
-        // Compute van der Waals forces
-        for (let j = 0; j < NUM_MOLECULES; j++) {
-            if (i !== j) {
-                let other = molecules[j];
-                let dx = other.x - mol.x;
-                let dy = other.y - mol.y;
-
-                // Periodic boundary adjustment
-                if (dx > WIDTH / 2) dx -= WIDTH;
-                if (dx < -WIDTH / 2) dx += WIDTH;
-                if (dy > HEIGHT / 2) dy -= HEIGHT;
-                if (dy < -HEIGHT / 2) dy += HEIGHT;
-
-                let r = Math.sqrt(dx * dx + dy * dy);
-                if (r > 0 && r < 50) { // Cutoff distance for force
-                    let force = computeLJForce(r);
-                    fx += force * (dx / r);
-                    fy += force * (dy / r);
-                }
-            }
-        }
-
-        // Update velocity (F = ma)
-        mol.vx += fx / MASS * dt;
-        mol.vy += fy / MASS * dt;
-
-        // Update position
-        mol.x += mol.vx * dt;
-        mol.y += mol.vy * dt;
-
-        // Periodic boundary conditions
-        if (mol.x < 0) mol.x += WIDTH;
-        if (mol.x > WIDTH) mol.x -= WIDTH;
-        if (mol.y < 0) mol.y += HEIGHT;
-        if (mol.y > HEIGHT) mol.y -= HEIGHT;
-    }
-
-    // Handle collisions
-    for (let i = 0; i < NUM_MOLECULES; i++) {
-        for (let j = i + 1; j < NUM_MOLECULES; j++) {
-            let mol1 = molecules[i];
-            let mol2 = molecules[j];
-            let dx = mol2.x - mol1.x;
-            let dy = mol2.y - mol1.y;
-
-            // Periodic boundary adjustment
-            if (dx > WIDTH / 2) dx -= WIDTH;
-            if (dx < -WIDTH / 2) dx += WIDTH;
-            if (dy > HEIGHT / 2) dy -= HEIGHT;
-            if (dy < -HEIGHT / 2) dy += HEIGHT;
-
-            let dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 2 * RADIUS) {
-                // Elastic collision
-                let nx = dx / dist;
-                let ny = dy / dist;
-                let dvx = mol2.vx - mol1.vx;
-                let dvy = mol2.vy - mol1.vy;
-                let dot = dvx * nx + dvy * ny;
-
-                mol1.vx += dot * nx;
-                mol1.vy += dot * ny;
-                mol2.vx -= dot * nx;
-                mol2.vy -= dot * ny;
-
-                // Prevent overlap
-                let overlap = 2 * RADIUS - dist;
-                mol1.x -= overlap * nx / 2;
-                mol1.y -= overlap * ny / 2;
-                mol2.x += overlap * nx / 2;
-                mol2.y += overlap * ny / 2;
-            }
-        }
-    }
-}
-
-// Calculate temperature
-function calculateTemperature() {
-    let totalKE = 0;
-    for (let mol of molecules) {
-        let speed = Math.sqrt(mol.vx * mol.vx + mol.vy * mol.vy);
-        totalKE += 0.5 * MASS * speed * speed;
-    }
-    let avgKE = totalKE / NUM_MOLECULES;
-    let temp = avgKE / KB; // 2D: 1 kT per molecule
-    return temp;
-}
-
-// Draw molecules
-function draw() {
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    ctx.fillStyle = 'blue';
-    for (let mol of molecules) {
-        ctx.beginPath();
-        ctx.arc(mol.x, mol.y, RADIUS, 0, 2 * Math.PI);
-        ctx.fill();
-    }
-}
-
-// Animation loop
-function animate() {
-    updateMolecules(0.01); // Time step: 10ms
-    draw();
-    tempDisplay.textContent = `Temperature: ${calculateTemperature().toFixed(2)} K`;
-    requestAnimationFrame(animate);
-}
-
-// Start simulation
-initMolecules();
-animate();
-Step 6: Run the Simulation
-•	Save all files.
-•	Open index.html in a web browser.
-•	Verify that: 
-o	30 blue circles (molecules) move within the canvas.
-o	Molecules bounce off each other and wrap around the canvas edges (periodic boundaries).
-o	The temperature label updates in real-time based on molecular speeds.
-Step 7: Analyze the Output
-•	Observe the motion of molecules and note any clustering due to van der Waals forces.
-•	Record the temperature fluctuations and compare with expected values (e.g., room temperature ~300 K).
-•	Check for smooth animation and correct collision behavior.
-Step 8: Document the Results
-•	Note the initial conditions (e.g., random velocities, number of molecules).
-•	Record the average temperature and any anomalies in molecule behavior.
-•	Save screenshots or video of the simulation for the lab report.
-7. Source Code (Prompt for Generating Simulation)
-
-Prompt 1:
-"Create a physics simulation in JavaScript of a container full of 30 molecules. The molecules should be simple diatomic helium gas molecules. In addition to collision physics, also add corrections for van der Waals forces and apply distortion to the mechanics of the molecules based on these forces."
-
-Prompt 2:
-"Create a simple 2D demonstration of the above in JavaScript to the level of complexity that you can code."
-
-Prompt 3:
-"Using the mass of the helium nucleus and the speed of the gas molecules, have a label that outputs the temperature of the box at any instant. Use statistical mechanics to calculate the temperature."
-________________________________________
-8. Expected Output
-•	Visual Output: 
-o	A 600x600 pixel canvas displaying 30 blue circles moving and colliding.
-o	Molecules wrap around the canvas edges due to periodic boundary conditions.
-o	Slight clustering or attraction between molecules due to simplified van der Waals forces.
-•	Temperature Display: 
-o	A label below the canvas showing the temperature (e.g., "Temperature: 298.45 K").
-o	Temperature fluctuates based on the average kinetic energy of the molecules.
-•	Behavior: 
-o	Molecules exhibit realistic motion, with elastic collisions and minor distortions from van der Waals forces.
-o	Temperature remains within a reasonable range (e.g., 200–400 K) depending on initial velocities.
-Sample Output:
-•	Canvas shows 30 molecules moving smoothly.
-•	Temperature label updates every frame, e.g., "Temperature: 305.12 K".
-•	Molecules occasionally cluster briefly due to attractive forces before dispersing.
-________________________________________
-9. Observations
-•	Molecules move randomly with varying speeds.
-•	Collisions are elastic, conserving momentum.
-•	Van der Waals forces cause slight attractions, observable as temporary groupings.
-•	Temperature fluctuates but stabilizes around an average value.
-•	Periodic boundaries ensure no molecules are lost.
-•	Example: 
-o	Initial temperature: ~320 K.
-o	After 10 seconds: ~310 K.
-o	Observed 5–10 collisions per second.
-________________________________________
-10. Results
-•	Successfully simulated 30 helium molecules in a 2D container.
-•	Implemented elastic collisions and simplified van der Waals forces using a Lennard-Jones-like model.
-•	Calculated and displayed real-time temperature using statistical mechanics.
-•	Applied periodic boundary conditions for an infinite system effect.
-•	Example: "The simulation ran smoothly with an average temperature of 300 K, showing realistic molecular interactions."
-________________________________________
-11. Viva Questions
-The following questions test understanding of the experiment:
-1.	What is the objective of this simulation? 
-o	Ans: To visualize the motion and collisions of 30 helium molecules in a 2D container, calculate the system’s temperature, and model van der Waals forces.
-2.	What assumptions were made in the simulation? 
-o	Ans: Assumed diatomic helium molecules (though helium is monatomic), elastic collisions, simplified van der Waals forces, and periodic boundary conditions for an infinite system.
-3.	What is the Lennard-Jones potential, and why is it used? 
-o	Ans: It models intermolecular forces with repulsive (short-range) and attractive (long-range) components. It’s used to simulate realistic interactions between molecules.
-4.	How are periodic boundary conditions implemented? 
-o	Ans: When a molecule exits one side of the canvas (e.g., x < 0), it reappears on the opposite side (x += WIDTH), maintaining its velocity.
-5.	How is the temperature calculated in the simulation? 
-o	Ans: Using the average kinetic energy: T=1NkB∑12mvi2 T = \frac{1}{N k_B} \sum \frac{1}{2} m v_i^2 T=NkB1∑21mvi2, where vi v_i vi is the speed of each molecule.
-6.	What role do van der Waals forces play in the simulation? 
-o	Ans: They cause weak attractions between molecules, leading to temporary clustering, modeled by a simplified Lennard-Jones potential.
-7.	What analyses can be performed on the simulation data? 
-o	Ans: Temperature monitoring, velocity distribution, collision frequency, and pressure estimation.
-8.	How do you ensure the simulation is accurate? 
-o	Ans: Use correct physical equations, validate against theory, choose a small time step (e.g., 0.01 s), and tune parameters like ϵ \epsilon ϵ and σ \sigma σ.
-9.	Why is helium modeled as diatomic in this simulation? 
-o	Ans: For educational purposes, to explore pairwise interactions, though helium is monatomic in reality.
-10.	What challenges did you face in implementing the simulation? 
-o	Ans: [Student’s response, e.g., “Balancing force calculations with performance was tricky.”]
-________________________________________
-12. Precautions
-•	Ensure the time step (dt) is small (e.g., 0.01 s) to avoid numerical instability.
-•	Validate initial velocities to prevent unrealistic temperatures (e.g., cap speeds at ~500 pixels/s).
-•	Test periodic boundary conditions to ensure molecules wrap correctly.
-•	Use a cutoff distance for van der Waals forces to optimize performance.
-•	Save code frequently and test incrementally to debug issues.
-________________________________________
-13. Conclusion
-This experiment successfully demonstrates a 2D simulation of helium molecules using JavaScript and HTML5 Canvas. Students learn to model molecular motion, implement collisions, apply van der Waals forces, and calculate temperature using statistical mechanics. The simulation provides an educational tool to visualize gas behavior and verify theoretical concepts, preparing students for advanced computational physics.
-_______________________________________
+# Run the algorithm
+aStarAlgo('S', 'G')
 
 
+week3
 
-8
-AIM:
-To develop a Python script that uses the googletrans library to translate multilingual conversation snippets into English, enabling cross-lingual understanding.
-________________________________________
-PROCEDURE:
-1.	Identify the source and target languages.
-2.	Set up the environment in Google Colab or local IDE.
-3.	Install the googletrans library.
-4.	Define a function to translate text to English.
-5.	Create a list of multilingual conversation snippets.
-6.	Loop through each snippet and display its original and translated versions.
-7.	Execute and observe the results.
-________________________________________
-SOURCE CODE:
-python
-CopyEdit
-# Import the Translator class
-from googletrans import Translator
+           from sys import maxsize  # Import maxsize to represent an infinitely large value (for comparison)
+from itertools import permutations  # Import permutations to generate all possible orders of cities
 
-# Define translation function
-def translate_text(text, dest_lang="en"):
-    translator = Translator()
-    translated = translator.translate(text, dest=dest_lang)
-    return translated.text
+v = 4  # Number of cities (vertices), here v = 4 (cities labeled 0, 1, 2, 3)
 
-# Multilingual conversation snippets
-conversations = [
-    {"text": "¿Cómo estás?", "lang": "es"},
-    {"text": "Bonjour, comment ça va ?", "lang": "fr"},
-    {"text": "Wie geht's dir?", "lang": "de"},
-    {"text": "今日はどうですか？", "lang": "ja"},
-    {"text": "How's your day going?", "lang": "en"},
+# Function to find the shortest path for the Traveling Salesman Problem
+def travellingSalesmanProblem(graph, s):
+    vertex = []  # List to store all cities excluding the start city 's'
+
+    # Loop through all the cities and add those that are not the starting city 's'
+    for i in range(v):
+        if i != s:
+            vertex.append(i)  # Add city i to the list 'vertex' if it's not the start city
+
+    # Initialize min_path to a very large value (infinity), so it can be updated with valid paths
+    min_path = maxsize
+
+    # Generate all possible permutations of the cities in 'vertex'
+    # This will give all possible orders of visiting the cities
+    next_permutation = permutations(vertex)
+
+    # Iterate through each permutation of cities
+    for i in next_permutation:
+        current_pathweight = 0  # Initialize the total distance of the current path
+        k = s  # Start at the initial city (starting city is 's')
+
+        # Loop through the cities in the current permutation
+        for j in i:
+            current_pathweight += graph[k][j]  # Add the distance from the current city 'k' to the next city 'j'
+            k = j  # Update the current city to the next city
+
+        # After visiting all cities, add the distance to return to the starting city
+        current_pathweight += graph[k][s]  # Add the distance from the last city back to the start city
+
+        # Update min_path if the current path weight is smaller than the previous min_path
+        min_path = min(min_path, current_pathweight)
+
+    # Return the shortest path found after evaluating all permutations
+    return min_path
+
+# Example graph where the value graph[i][j] represents the distance from city 'i' to city 'j'
+graph = [
+    [0, 10, 15, 20],  # Distances from city 0 to others
+    [10, 0, 35, 25],  # Distances from city 1 to others
+    [15, 35, 0, 30],  # Distances from city 2 to others
+    [20, 25, 30, 0]   # Distances from city 3 to others
 ]
 
-# Translate and print
-for conv in conversations:
-    print(f"Original ({conv['lang']}): {conv['text']}")
-    translated = translate_text(conv['text'])
-    print(f"Translated to English: {translated}\n")
-________________________________________
-EXPECTED OUTPUT:
-vbnet
-CopyEdit
-Original (es): ¿Cómo estás?
-Translated to English: How are you?
+s = 0  # Set the starting city (index 0, which is city 0)
 
-Original (fr): Bonjour, comment ça va ?
-Translated to English: Hello, how are you?
+# Call the function and print the result
+print(travellingSalesmanProblem(graph, s))  #
 
-Original (de): Wie geht's dir?
-Translated to English: How are you?
+colors=['Red','Blue','Green']
+states=['a','b','c','d']
+neighbors={}
+neighbors['a']=['b','c','d']
+neighbors['b']=['a','d']
+neighbors['c']=['a','d']
+neighbors['d']=['c','b','a']
 
-Original (ja): 今日はどうですか？
-Translated to English: How is today?
+colors_of_states={}
 
-Original (en): How's your day going?
-Translated to English: How's your day going?
-________________________________________
-VIVA QUESTIONS
-1.	How do you ensure translation accuracy in cross-lingual conversations?
-By using context-aware tools, validating with native speakers, and double-checking for ambiguous terms.
-2.	What are the challenges in cross-lingual communication?
-Language barriers, cultural differences, idiomatic expressions, and technical limitations.
-3.	What role does non-verbal communication play?
-It helps convey meaning when verbal communication is unclear – facial expressions, gestures, tone.
-4.	How do you manage misunderstandings in cross-lingual settings?
-By rephrasing, clarifying, and using tools or visuals to reinforce the message.
-5.	What ethical considerations are involved in translations?
-Maintaining confidentiality, avoiding bias, ensuring respect for cultural context, and providing accurate translations.
+def promising(state,color):#d,green
+    for neighbor in neighbors.get(state):#c,b,a
+        color_of_neighbor=colors_of_states.get(neighbor)#blue
+        if color_of_neighbor==color:#b==b
+            return False
+    return True
+
+def get_color_for_state(state):#d
+    for color in colors:#Red,Blue,Green
+        if promising(state,color):#d,Red
+            return color
+
+def main():
+    for state in states:#c,d
+        colors_of_states[state]=get_color_for_state(state)#a:Red,b:blue,c:blue,d:green
+
+    print(colors_of_states)
+
+main()
+
+                        
+ week-4
+from sympy import symbols, Or, Not, Implies,Xor,satisfiable
+ 
+Rain = symbols('Rain')
+Harry_Visited_Hagrid = symbols('Harry_Visited_Hagrid')
+Harry_Visited_Dumbledore = symbols('Harry_Visited_Dumbledore')
+
+# Define the logical expressions based on the given statements
+sentence_1 = Implies(Not(Rain), Harry_Visited_Hagrid)
+sentence_2 = Xor(Harry_Visited_Hagrid, Harry_Visited_Dumbledore)
+sentence_3 = Harry_Visited_Dumbledore
+
+# Combine the statements
+knowledge_base = sentence_1 & sentence_2 & sentence_3
+
+#Finding the solution  
+solution = satisfiable(knowledge_base, all_models=True)
+
+#To print the output
+for model in solution:
+    if model[Rain]:
+        print("It rained today.")
+    else:
+        print("There is no rain today.")
 
 
+
+
+
+                 #week5
+
+#Bayesian Network
+# Define conditional probability tables (CPTs)
+P_burglary = 0.002#t
+P_earthquake = 0.001#t
+
+# Probability of alarm given burglary and earthquake
+P_alarm_given_burglary_and_earthquake = 0.94
+P_alarm_given_burglary_and_no_earthquake = 0.95
+P_alarm_given_no_burglary_and_earthquake = 0.31
+P_alarm_given_no_burglary_and_no_earthquake = 0.001
+
+# Probability of David calling given alarm
+P_david_calls_given_alarm = 0.91#t
+P_david_does_not_call_given_alarm = 0.09
+P_david_calls_given_no_alarm = 0.05#t
+P_david_does_not_call_given_no_alarm = 0.95
+
+# Probability of Sophia calling given alarm
+P_sophia_calls_given_alarm = 0.75
+P_sophia_does_not_call_given_alarm = 0.25
+P_sophia_calls_given_no_alarm = 0.02
+P_sophia_does_not_call_given_no_alarm = 0.98
+
+# Calculate joint probability
+def joint_probability(alarm, burglary, earthquake, david_calls, sophia_calls):#(t,f,f,t,t)
+    if alarm:
+        if burglary and earthquake:
+            P_alarm = P_alarm_given_burglary_and_earthquake
+        elif burglary:
+            P_alarm = P_alarm_given_burglary_and_no_earthquake
+        elif earthquake:
+            P_alarm = P_alarm_given_no_burglary_and_earthquake
+        else:
+            P_alarm = P_alarm_given_no_burglary_and_no_earthquake#0.001
+    else:
+        if burglary and earthquake:
+            P_alarm = 1 - P_alarm_given_burglary_and_earthquake
+        elif burglary:
+            P_alarm = 1 - P_alarm_given_burglary_and_no_earthquake
+        elif earthquake:
+            P_alarm = 1 - P_alarm_given_no_burglary_and_earthquake
+        else:
+            P_alarm = 1 - P_alarm_given_no_burglary_and_no_earthquake
+
+    P_david = (P_david_calls_given_alarm if david_calls else P_david_does_not_call_given_alarm) if alarm else (P_david_calls_given_no_alarm if david_calls else P_david_does_not_call_given_no_alarm)#0.91
+
+    P_sophia = (P_sophia_calls_given_alarm if sophia_calls else P_sophia_does_not_call_given_alarm) if alarm else (P_sophia_calls_given_no_alarm if sophia_calls else P_sophia_does_not_call_given_no_alarm)#0.75
+
+    return (P_burglary if burglary else 1 - P_burglary) * (P_earthquake if earthquake else 1 - P_earthquake) * P_alarm * P_david * P_sophia#0.75*0.91*0.001*0.998*0.999
+
+# Calculate the probability for the given scenario
+result = joint_probability(
+    alarm=True,
+    burglary=False,
+    earthquake=False,
+    david_calls=True,
+    sophia_calls=True
+)
+
+
+# Print the result
+print(f'The probability that the alarm has sounded, there is neither a burglary nor an earthquake, and both David and Sophia called Harry is: {result:.8f}')
+
+
+
+week6
+
+import numpy as np
+import itertools
+import pandas as pd
+
+# Define state space and probabilities
+states = ['sleeping', 'eating', 'pooping']
+hidden_states = ['healthy', 'sick']
+pi = [0.5, 0.5]  # Initial state probabilities
+
+# Initial state distribution
+state_space = pd.Series(pi, index=hidden_states, name='states')
+print("Initial Probabilities:\n", state_space, "\n")
+
+# Transition probabilities (hidden -> hidden)
+a_df = pd.DataFrame(columns=hidden_states, index=hidden_states)
+a_df.loc['healthy'] = [0.7, 0.3]
+a_df.loc['sick'] = [0.4, 0.6]
+print("Transition Probabilities:\n", a_df, "\n")
+
+# Emission probabilities (hidden -> observable)
+b_df = pd.DataFrame(columns=states, index=hidden_states)
+b_df.loc['healthy'] = [0.2, 0.6, 0.2]
+b_df.loc['sick'] = [0.4, 0.1, 0.5]
+print("Emission Probabilities:\n", b_df, "\n")
+
+# Forward algorithm: Total probability of observation sequence
+def forward_algorithm(obs_seq, a_df, b_df, pi, hidden_states):
+    total_prob = 0
+    all_state_paths = list(itertools.product(hidden_states, repeat=len(obs_seq)))
+
+    for path in all_state_paths:
+        prob = pi[hidden_states.index(path[0])] * b_df.loc[path[0], obs_seq[0]]
+        for t in range(1, len(obs_seq)):
+            prev_state = path[t - 1]
+            curr_state = path[t]
+            prob *= a_df.loc[prev_state, curr_state] * b_df.loc[curr_state, obs_seq[t]]
+        total_prob += prob
+
+    return total_prob
+
+# Viterbi algorithm: Most likely hidden state sequence
+def viterbi_algorithm(obs_seq, a_df, b_df, pi, hidden_states):
+    max_prob = 0
+    best_path = None
+    all_state_paths = list(itertools.product(hidden_states, repeat=len(obs_seq)))
+
+    for path in all_state_paths:
+        prob = pi[hidden_states.index(path[0])] * b_df.loc[path[0], obs_seq[0]]
+        for t in range(1, len(obs_seq)):
+            prev_state = path[t - 1]
+            curr_state = path[t]
+            prob *= a_df.loc[prev_state, curr_state] * b_df.loc[curr_state, obs_seq[t]]
+        if prob > max_prob:
+            max_prob = prob
+            best_path = path
+
+    return max_prob, best_path
+
+# Example observation sequence
+obsq = ['sleeping', 'eating', 'sleeping']
+
+# Run and print
+print("Forward (total probability):", forward_algorithm(obsq, a_df, b_df, pi, hidden_states))
+v_prob, v_path = viterbi_algorithm(obsq, a_df, b_df, pi, hidden_states)
+print("Viterbi (most probable state path):", v_path)
+print("Viterbi probability:", v_prob)
+
+
+week7
+
+implement Regression algorithm
+Importing the libraries
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+dataset = pd.read_csv('/content/Salary_Data.csv')
+print(dataset)
+
+X = dataset.iloc[:, :-1].values  #independent variable array
+y = dataset.iloc[:,1].values  #dependent variable vector
+
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X,y,test_size=1/3,random_state=0)
+
+
+# fitting the regression model
+from sklearn.linear_model import LinearRegression
+regressor = LinearRegression()
+regressor.fit(X_train,y_train) #actually produces the linear eqn for the data
+
+predicting the test set results
+y_pred = regressor.predict(X_test)
+print(X_test)
+y_test
+
+# visualizing the results
+#plot for the TRAIN
+plt.scatter(X_train, y_train, color='red') # plotting the observation line
+plt.plot(X_train, regressor.predict(X_train), color='blue') # plotting the regression line
+plt.title("Salary vs Experience (Training set)") # stating the title of the graph
+plt.xlabel("Years of experience") # adding the name of x-axis
+plt.ylabel("Salaries") # adding the name of y-axis
+plt.show() # specifies end of graph
+
+
+#plot for the TEST
+plt.scatter(X_test, y_test, color='red')
+plt.plot(X_train, regressor.predict(X_train), color='blue') # plotting the regression line
+plt.title("Salary vs Experience (Testing set)")# stating the title of the graph
+plt.xlabel("Years of experience")# adding the name of x-axis
+plt.ylabel("Salaries")# adding the name of y-axis
+plt.show()# specifies end of graph
+
+
+week 9
+
+import matplotlib.pyplot as plt
+from sklearn import datasets
+from sklearn.cluster import KMeans
+import sklearn.metrics as sm
+import pandas as pd
+import numpy as np
+iris =datasets.load_iris()
+X=pd.DataFrame(iris.data)
+X.columns=['Sepal_Length','Sepal_Width', 'Petal_length', 'Petal_Width']
+print(X)
+y=pd.DataFrame(iris.target)
+y.columns=['target']
+print(y)
+
+plt.figure(figsize=(14,7))
+colormap=np.array(['red','lime','black'])
+plt.subplot(1,2,1)
+plt.scatter(X.Sepal_Length,X.Sepal_Width,c=colormap[y.target],s=40)
+plt.title('Sepal')
+plt.subplot(1,2,2)
+plt.scatter(X.Petal_length,X.Petal_Width,c=colormap[y.target],s=40)
+plt.title('Petal')
+plt.show()
+
+model=KMeans(n_clusters=3)
+model.fit(X)
+print(model.labels_)
+plt.subplot(1,2,1)
+plt.scatter(X.Petal_length,X.Petal_Width,c=colormap[y.target],s=40)
+plt.title('Real Classification')
+plt.subplot(1,2,2)
+plt.scatter(X.Petal_length,X.Petal_Width,c=colormap[model.labels_],s=40)
+plt.title( 'KMEANS Classfication')
+plt.show()
+
+print('Accuracy')
+print(sm.accuracy_score(y,model.labels_))
+print('Confusion_matrix')
+print(sm.confusion_matrix(y,model.labels_))
+print('classification_report')
+print(sm.classification_report(y,model.labels_))
+
+week 10
+
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn import datasets
+import pandas as pd
+import numpy as np
+iris = datasets.load_iris()
+X = pd.DataFrame(iris.data)
+X.columns = ['Sepal_Length', 'Sepal_Width', 'Petal_Length', 'Petal_Width']
+print(X)
+y = pd.DataFrame(iris.target)
+y.columns = ['Targets']
+print(y)
+
+#Split the data into train and test samples
+x_train,x_test,y_train,y_test = train_test_split(iris.data,iris.target,test_size=0.1)
+print("Dataset is split into training and testing...")
+print("Size of training data and its label",x_train.shape,y_train.shape)
+print("Size of testing data and its label",x_test.shape,y_test.shape)
+
+# prints Label no. and their names
+for i in range(len(iris.target_names)):
+  print("Label", i , "-",str(iris.target_names[i]))
+
+#create object of KNN classifer
+classifer = KNeighborsClassifier(n_neighbors=3)
+
+#perform Training
+classifer.fit(x_train, y_train)#perform teating
+y_pred=classifer.predict(x_test)
+
+#Display the results
+print("Results of Classification using K-nn with K=3")
+for r in range(0,len(x_test)):
+  print(" sample:", str(x_test[r]), " Actual-label:",str(y_test[r]), " predict-label:", str(y_pred[r]))
+print("Classification Accuracy :" , classifer.score(x_test,y_test))
+from sklearn.metrics import classification_report, confusion_matrix
+print('Confusion Matrix')
+print(confusion_matrix(y_test,y_pred))
+print('Accuracy Ketrics')
+print(classification_report(y_test,y_pred))
+
+week11
+
+import numpy as np
+X = np.array(([2,9],[1,5],[3,6])) #Hours Studied,Hours Slept
+y=np.array(([92],[86],[89])) #Test Score
+y=y/100 #Max Test Score is 100
+#Sigmoid Function
+def sigmoid(x):
+return 1/(1+ np.exp(-x))
+#Derivatives of Sigmoid function
+def derivatives_sigmoid(x):
+return x*(1-x)
+#Variable initialization
+epoch=10000 #Setting training iterations
+lr=0.1 #Setting learning rate
+inputlayer_neurons = 2 #number of features in data set
+hiddenlayers_neurons = 3 #number of hidden layers neurons
+output_neurons = 1 #number of neurons of output layer
+#weight and bias initialization
+wh=np.random.uniform(size=(inputlayer_neurons,hiddenlayers_neurons))
+bias_hidden=np.random.uniform(size=(1,hiddenlayers_neurons)) #bias matri
+weight_hidden=np.random.uniform(size=(hiddenlayers_neurons,output_neurons)) #weight matrix to the output layer
+bias_output=np.random.uniform(size=(1,output_neurons)) #matrix to output layer
+for i in range(epoch):
+hinp1=np.dot(X,wh)
+hinp=hinp1+ bias_hidden
+hlayer_activation = sigmoid(hinp)
+outinp1=np.dot(hlayer_activation,weight_hidden)
+outinp = outinp1+bias_output
+output = sigmoid(outinp)
+EO = y-output
+outgrad=derivatives_sigmoid(output)
+d_output = EO * outgrad
+EH = d_output.dot(weight_hidden.T)
+hiddengrad=derivatives_sigmoid(hlayer_activation)
+d_hiddenlayer = EH * hiddengrad
+weight_hidden += hlayer_activation.T.dot(d_output) * lr
+bias_hidden += np.sum(d_hiddenlayer, axis=0,keepdims=True) * lr
+wh += X.T.dot(d_hiddenlayer) * lr
+bias_output += np.sum(d_output,axis=0,keepdims=True) *lr
+print("Input: \n"+str(X))
+print("Actual Output: \n"+str(y))
+print("Predicted Output: \n",output)
+
+week12
+
+12) Write a program to implement Support Vector Machine.
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+# Load the Iris dataset
+iris = datasets.load_iris()
+X = iris.data # Features: sepal length, sepal width, petal length, petal width
+y = iris.target # Labels: three species of Iris
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+# Initialize the SVM classifier
+svm_model = SVC(kernel='linear') # You can also try 'rbf', 'poly', etc.
+# Train the SVM model on the training data
+svm_model.fit(X_train, y_train)
+# Make predictions on the test data
+y_pred = svm_model.predict(X_test)
+# Evaluate the model's performance
+accuracy = accuracy_score(y_test, y_pred)
+print("Accuracy:", accuracy)
+print("Classification Report:\n", classification_report(y_test, y_pred))
